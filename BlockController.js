@@ -28,11 +28,14 @@ class BlockController {
         this.initializeMockData();
         this.getBlockByIndex();
         this.postNewBlock();
+        this.requestValidation();
+        this.validate();
     }
 
     /**
      * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
      */
+   
     getBlockByIndex() {
         this.app.get("/block/:blockheight", (req, res) => {
             // Add your code here
@@ -69,6 +72,7 @@ class BlockController {
     /**
      * Implement a POST Endpoint to add a new Block, url: "/api/block"
      */
+    
     postNewBlock() {
         this.app.post("/block", (req, res) => {
            
@@ -122,7 +126,57 @@ class BlockController {
         });
     }
 
+    requestValidation() {
+        this.app.post("/requestValidation", (req, res) => {
+                           
+            console.log(req.body);
 
+            if(isEmpty(req.body)) {                 
+                res.send('Wrong entry, no data object found!');
+            } 
+            else {   
+                /*
+                REQUEST:
+                { "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL" }
+                curl -X POST \
+                http://localhost:8000/requestValidation \
+                -H 'Content-Type: application/json' \
+                -H 'cache-control: no-cache' \
+                -d '{ "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL" }'
+                */                
+
+                /*
+                {
+                "walletAddress": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                "requestTimeStamp": "1544451269",
+                "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1544451269:starRegistry",
+                "validationWindow": 300
+                }
+                Message format = [walletAddress]:[timeStamp]:starRegistry
+                */
+                let walletAddress=req.body.address
+                let timeStamp = new Date().getTime().toString().slice(0,-3)
+                var msg=`${walletAddress}:${timeStamp}:starRegistry`
+                var result={
+                "walletAddress": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                "requestTimeStamp": "1544451269",
+                "message": ""+msg+"",
+                "validationWindow": 300
+                }
+
+                result=JSON.stringify(result)
+                console.log(result);
+                res.send(result);
+            }
+        });
+    }
+
+    validate(){
+        this.app.post("/message-signature/validate", (req, res) => {
+            console.log(req);
+            res.send(result);
+        });
+    }
     // getAllBlocks() {
     //     this.app.get("/blocks", (req, res) => {
             
