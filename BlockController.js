@@ -164,6 +164,8 @@ class BlockController {
                 "validationWindow": 300
                 }
 
+ 
+
                 result=JSON.stringify(result)
                 console.log(result);
                 res.send(result);
@@ -173,7 +175,37 @@ class BlockController {
 
     validate(){
         this.app.post("/message-signature/validate", (req, res) => {
-            console.log(req);
+            /*
+            REQUEST:
+            {
+                "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                 "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
+            }
+            
+            curl -X POST \
+            http://localhost:8000/message-signature/validate \
+            -H 'Content-Type: application/json' \
+            -H 'cache-control: no-cache' \
+            -d '{
+            "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+            "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
+            }'
+
+            RESPONSE:
+                 {
+                    "registerStar": true,
+                    "status": {
+                        "address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                        "requestTimeStamp": "1544454641",
+                        "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1544454641:starRegistry",
+                        "validationWindow": 193,
+                        "messageSignature": true
+                    }
+                }
+
+            */
+            var result  = 'address=======' + req.body.address;
+            console.log(result);
             res.send(result);
         });
     }
