@@ -32,6 +32,9 @@ class BlockController {
         this.postNewBlock();
         this.requestValidation();
         this.validate();
+        
+        this.mempool = [];
+        this.timeoutRequests = [];
     }
     
     /**
@@ -161,20 +164,30 @@ class BlockController {
                 wallet.message=`${wallet.walletAddress}:${wallet.requestTimeStamp}:starRegistry`;
                 wallet.validationWindow=300;
                 
-                //Add Wallet
-                wallet.addWallet(wallet.walletAddress,JSON.stringify(wallet))
-                .then((result) => {
-                     res.send(result) 
-                })
-             
+                /****** Add Wallet ******/
+                // call the function
+                var x= wallet.getWallet(wallet.walletAddress);
+                var y= wallet.addWallet(wallet.walletAddress,JSON.stringify(wallet));
+
+                console.log('x\t',x);
+                console.log('y\t',y);
                 
+                // wallet.addWallet(wallet.walletAddress,JSON.stringify(wallet))
+                // .then((result) => {
+                //      res.send(result) 
+                // })
+             
+                // this.AddRequestValidation(req.body.address)
                 
                 
                 
             }
         });
     }
-    
+    AddRequestValidation(address){
+        this.mempool.push(address);
+        this.timeoutRequests = [];
+    }
     validate(){
         this.app.post("/message-signature/validate", (req, res) => {
             /*
