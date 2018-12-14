@@ -69,6 +69,19 @@ class BlockAPI {
 		this.app.get('/', function(req, res){
 			console.log('visiting /');
 		});
+
+
+		// let timeElapse = (new Date().getTime().toString().slice(0,-3)) - 1544750580;
+		// let timeLeft = (TimeoutRequestsWindowTime/1000) - timeElapse;
+		// let validationWindow = timeLeft;
+
+		// self.timeoutRequests[request.walletAddress]=setTimeout(function(){ 
+		// 	console.log('timeOutReq=',validationWindow);			
+		// 	// self.removeValidationRequest(request.walletAddress) 
+		// }, TimeoutRequestsWindowTime );
+
+ 
+
 		// bc.getBlock(0).then((b) => {
 		// 	// c(JSON.parse(b))
 		// 	// res.send(JSON.parse(b));

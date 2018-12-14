@@ -1,7 +1,9 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./Block.js');
 const BlockChainClass = require('./BlockChain.js');
-const WalletClass = require('./Wallet.js');
+const RequestClass=  require('./Request.js');
+
+const TimeoutRequestsWindowTime = 20*1000;
 
 
 function c(txt){
@@ -132,9 +134,10 @@ class BlockController {
     }
     
     requestValidation() {
-        this.app.post("/requestValidation", (req, res) => {
+        let self = this;
+        self.app.post("/requestValidation", (req, res) => {
             
-            console.log(req.body);
+            // console.log(req.body);
             
             if(isEmpty(req.body)) {                 
                 res.send('Wrong entry, no data object found!');
@@ -159,35 +162,81 @@ class BlockController {
                 }
                 Message format = [walletAddress]:[timeStamp]:starRegistry
                 */
-                
-                let wallet=new WalletClass.Wallet(req.body.address);
-                wallet.message=`${wallet.walletAddress}:${wallet.requestTimeStamp}:starRegistry`;
-                wallet.validationWindow=300;
-                
-                /****** Add Wallet ******/
-                // call the function
-                var x= wallet.getWallet(wallet.walletAddress);
-                var y= wallet.addWallet(wallet.walletAddress,JSON.stringify(wallet));
+ 
+               let request=new RequestClass.Request(req.body.address);
+               request.message=`${request.walletAddress}:${request.requestTimeStamp}:starRegistry`;
+               request.validationWindow=30;
 
-                console.log('x\t',x);
-                console.log('y\t',y);
+
+               
                 
-                // wallet.addWallet(wallet.walletAddress,JSON.stringify(wallet))
-                // .then((result) => {
-                //      res.send(result) 
-                // })
-             
-                // this.AddRequestValidation(req.body.address)
-                
-                
-                
+                let result = self.AddRequestValidation(request)
+
+                 
+                res.send(result)
+
             }
         });
     }
-    AddRequestValidation(address){
-        this.mempool.push(address);
-        this.timeoutRequests = [];
+    startTime(req) {
+        let self=this
+
+                       
+        setTimeout(function(){
+
+            self.startTime(req)
+        }, 3*1000);
     }
+    AddRequestValidation(req){
+        let self = this;
+
+        let isAddressExist=false;
+        self.mempool.forEach(mem => {
+            if (mem.walletAddress==req.walletAddress) {
+                isAddressExist=true
+                req=mem
+            }
+        });
+        let errMsg=""
+        if (isAddressExist) {
+            errMsg='Warrnign:	this address exist!'
+            console.log(errMsg);
+            if (req.validationWindow<=0) {
+                errMsg='this request has expired!' 
+                req.status="----EXPIRED----"
+                console.log(errMsg);
+ 
+            } else {
+                req.status="Valid"
+
+            }
+            
+         }else{
+            req.status="Valid"
+            self.mempool.push(req);
+        }
+
+
+        let timeElapse = (new Date().getTime().toString().slice(0,-3)) - req.requestTimeStamp;
+        let timeLeft = (TimeoutRequestsWindowTime/1000) - timeElapse;
+
+        let timeStamp=new Date().getTime().toString().slice(0,-3)
+        let msg=`length:${self.mempool.length} |${req.walletAddress.toString().slice(31,34)}| requestTimeStamp:${req.requestTimeStamp}:| Now:${timeStamp}| status:${req.status}| timeLeft:${timeLeft}`               
+        console.log(msg); 
+
+        req.validationWindow = timeLeft;
+
+        let result={
+            "walletAddress": req.walletAddress,
+            "requestTimeStamp": req.requestTimeStamp,
+            "message": req.message,
+            "validationWindow": req.validationWindow
+           }
+
+        return req
+    }
+    
+     
     validate(){
         this.app.post("/message-signature/validate", (req, res) => {
             /*
