@@ -2,8 +2,9 @@ const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./Block.js');
 const BlockChainClass = require('./BlockChain.js');
 const RequestClass=  require('./Request.js');
+const bitcoinMessage = require('bitcoinjs-message'); 
 
-const TimeoutRequestsWindowTime = 20*1000;
+const TimeoutRequestsWindowTime = 5*60*1000;
 
 
 function c(txt){
@@ -145,19 +146,19 @@ class BlockController {
             else {   
                 /*
                 REQUEST:
-                { "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL" }
+                { "address":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc" }
                 curl -X POST \
                 http://localhost:8000/requestValidation \
                 -H 'Content-Type: application/json' \
                 -H 'cache-control: no-cache' \
-                -d '{ "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL" }'
+                -d '{ "address":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc" }'
                 */                
                 
                 /*
                 {
-                    "walletAddress": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                    "walletAddress": "1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
                     "requestTimeStamp": "1544451269",
-                    "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1544451269:starRegistry",
+                    "message": "1Kc8NccSW4qieURf2AjikTzs99vq1oBerc:1544451269:starRegistry",
                     "validationWindow": 300
                 }
                 Message format = [walletAddress]:[timeStamp]:starRegistry
@@ -165,7 +166,7 @@ class BlockController {
  
                let request=new RequestClass.Request(req.body.address);
                request.message=`${request.walletAddress}:${request.requestTimeStamp}:starRegistry`;
-               request.validationWindow=30;
+               request.validationWindow=300;
 
 
                
@@ -203,16 +204,16 @@ class BlockController {
             console.log(errMsg);
             if (req.validationWindow<=0) {
                 errMsg='this request has expired!' 
-                req.status="----EXPIRED----"
+                req.mempoolStatus="----EXPIRED----"
                 console.log(errMsg);
  
             } else {
-                req.status="Valid"
+                req.mempoolStatus="Valid"
 
             }
             
          }else{
-            req.status="Valid"
+            req.mempoolStatus="Valid"
             self.mempool.push(req);
         }
 
@@ -221,7 +222,7 @@ class BlockController {
         let timeLeft = (TimeoutRequestsWindowTime/1000) - timeElapse;
 
         let timeStamp=new Date().getTime().toString().slice(0,-3)
-        let msg=`length:${self.mempool.length} |${req.walletAddress.toString().slice(31,34)}| requestTimeStamp:${req.requestTimeStamp}:| Now:${timeStamp}| status:${req.status}| timeLeft:${timeLeft}`               
+        let msg=`length:${self.mempool.length} |${req.walletAddress.toString().slice(31,34)}| requestTimeStamp:${req.requestTimeStamp}:| Now:${timeStamp}| mempoolStatus:${req.mempoolStatus}| timeLeft:${timeLeft}`               
         console.log(msg); 
 
         req.validationWindow = timeLeft;
@@ -238,11 +239,18 @@ class BlockController {
     
      
     validate(){
-        this.app.post("/message-signature/validate", (req, res) => {
+        let self = this;
+
+        self.app.post("/message-signature/validate", (req, res) => {
+            
+            if(isEmpty(req.body)) {                 
+                res.send('Wrong entry, no data object found!');
+            } 
+            else {   
             /*
             REQUEST:
             {
-                "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                "address":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
                 "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
             }
             
@@ -251,7 +259,7 @@ class BlockController {
             -H 'Content-Type: application/json' \
             -H 'cache-control: no-cache' \
             -d '{
-                "address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                "address":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
                 "signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
             }'
             
@@ -259,19 +267,51 @@ class BlockController {
             {
                 "registerStar": true,
                 "status": {
-                    "address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+                    "address": "1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
                     "requestTimeStamp": "1544454641",
-                    "message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1544454641:starRegistry",
+                    "message": "1Kc8NccSW4qieURf2AjikTzs99vq1oBerc:1544454641:starRegistry",
                     "validationWindow": 193,
                     "messageSignature": true
                 }
             }
             
             */
-            var result  = 'address=======' + req.body.address;
-            console.log(result);
-            res.send(result);
+            
+            let isFoundInMempool=false
+            let selectedRequest
+           self.mempool.forEach(mem => {
+            if (mem.walletAddress==req.body.address) {
+                isFoundInMempool=true
+                selectedRequest=mem
+            }
         });
+        let isValid
+        let message
+        let address
+        let signature
+        if (selectedRequest.validationWindow>=0) {
+            // now check the signature
+            message=selectedRequest.message
+            address=selectedRequest.walletAddress
+            signature = req.body.signature
+            isValid= bitcoinMessage.verify(message, address, signature);
+
+        }
+
+        var result  = {
+            "registerStar": true,
+            "status": {
+                "address": selectedRequest.walletAddress,
+                "requestTimeStamp": selectedRequest.requestTimeStamp,
+                "message": selectedRequest.message,
+                "validationWindow": selectedRequest.validationWindow,
+                "messageSignature": isValid
+            }
+        }
+        console.log(result);
+        res.send(result);
+    }
+    });
     }
     // getAllBlocks() {
     //     this.app.get("/blocks", (req, res) => {

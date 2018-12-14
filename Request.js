@@ -9,7 +9,7 @@ class Request {
         this.requestTimeStamp = new Date().getTime().toString().slice(0,-3),
         this.message = "",
         this.validationWindow = 0
-        this.status=""
+        this.mempoolStatus=""
     }
 }
 
