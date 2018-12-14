@@ -122,7 +122,7 @@ class BlockChain{
               // Block hash with SHA256 using newBlock and converting to a string
               newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
               //finally VERY IMPORTANT - stringify block
-              c(newBlock)
+ 
               newBlock=JSON.stringify(newBlock).toString();
               
               // Adding block object to chain
