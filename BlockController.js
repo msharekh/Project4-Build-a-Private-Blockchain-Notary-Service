@@ -21,6 +21,14 @@ function isEmpty(obj) {
  * Controller Definition to encapsulate routes to work with blocks
  */
 // FIXME:
+  ____  _            _       _____            _             _ _           
+ |  _ \| |          | |     / ____|          | |           | | |          
+ | |_) | | ___   ___| | __ | |     ___  _ __ | |_ _ __ ___ | | | ___ _ __ 
+ |  _ <| |/ _ \ / __| |/ / | |    / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
+ | |_) | | (_) | (__|   <  | |___| (_) | | | | |_| | | (_) | | |  __/ |   
+ |____/|_|\___/ \___|_|\_\  \_____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
+                                                                          
+                                                                        
 class BlockController {
   /**
    * Constructor to create a new BlockController, you need to initialize here all your endpoints
@@ -161,7 +169,7 @@ class BlockController {
                         block.body.star.storyDecoded
                       );
 
-                      res.send(JSON.stringify(block));
+                      res.send(block);
                     })
                     .catch(e => console.error(`.addBlock catch(${e})`));
                 } else {
@@ -244,7 +252,6 @@ class BlockController {
       errMsg = 'Warrnign:	this address exist!';
       console.log(errMsg);
     } else {
-      req.mempoolStatus = 'Valid';
       self.mempool.push(req);
     }
 
@@ -263,9 +270,7 @@ class BlockController {
       self.mempool.length
     } |${req.walletAddress.toString().slice(31, 34)}| requestTimeStamp:${
       req.requestTimeStamp
-    }:| Now:${timeStamp}| mempoolStatus:${
-      req.mempoolStatus
-    }| timeLeft:${timeLeft}`;
+    }:| Now:${timeStamp}| timeLeft:${timeLeft}`;
     console.log(msg);
 
     // TODO: S-4.	When re-submitting within validation window, window should reduce to expires.
