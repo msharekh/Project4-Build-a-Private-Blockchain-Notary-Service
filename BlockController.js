@@ -18,17 +18,16 @@ function isEmpty(obj) {
   return true;
 }
 /**
- * Controller Definition to encapsulate routes to work with blocks
+ 
+   ____  _            _       _____            _             _ _           
+  |  _ \| |          | |     / ____|          | |           | | |          
+  | |_) | | ___   ___| | __ | |     ___  _ __ | |_ _ __ ___ | | | ___ _ __ 
+  |  _ <| |/ _ \ / __| |/ / | |    / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
+  | |_) | | (_) | (__|   <  | |___| (_) | | | | |_| | | (_) | | |  __/ |   
+  |____/|_|\___/ \___|_|\_\  \_____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
+
  */
-// FIXME:
-  ____  _            _       _____            _             _ _           
- |  _ \| |          | |     / ____|          | |           | | |          
- | |_) | | ___   ___| | __ | |     ___  _ __ | |_ _ __ ___ | | | ___ _ __ 
- |  _ <| |/ _ \ / __| |/ / | |    / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
- | |_) | | (_) | (__|   <  | |___| (_) | | | | |_| | | (_) | | |  __/ |   
- |____/|_|\___/ \___|_|\_\  \_____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
-                                                                          
-                                                                        
+
 class BlockController {
   /**
    * Constructor to create a new BlockController, you need to initialize here all your endpoints
@@ -42,7 +41,7 @@ class BlockController {
     this.postNewBlock();
     this.requestValidation();
     this.validate();
-
+    this.controllerGetBlockByHash();
     this.mempool = [];
     this.timeoutRequests = [];
   }
@@ -51,24 +50,39 @@ class BlockController {
    * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
    */
 
+  controllerGetBlockByHash() {
+    let self = this;
+    self.app.get('/stars/:hash', (req, res) => {
+      // Add your code here
+      var hash = req.params.hash;
+      console.log('hash', ':	', hash);
+
+      let bc = new BlockChainClass.BlockChain();
+      bc.getBlockByHash(hash)
+        .then(b => {
+          let block = JSON.parse(b);
+          let encodedStory = block.body.star.story;
+          console.log('encoded Story', '	', encodedStory);
+          let deocdedStory = hex2ascii(encodedStory);
+
+          block.body.star.storyDecoded = deocdedStory;
+
+          c(block);
+          res.send(block);
+        })
+        .catch(err => {
+          console.log('failed call by hash', err); // { error: 'url missing in async task 2' }
+          res.send(err);
+        });
+    });
+  }
   getBlockByIndex() {
     this.app.get('/block/:blockheight', (req, res) => {
       // Add your code here
       var blockheight = req.params.blockheight;
-
-      // this.initializeMockData();
-
-      // this.blocks[blockheight];
-
       console.log(
         `\n\n*** getBlockByBlockheight req blockheight= ${blockheight} ***`
       );
-
-      // try {
-
-      // } catch (error) {
-
-      // }
 
       let bc = new BlockChainClass.BlockChain();
 
@@ -367,6 +381,7 @@ class BlockController {
       }
     });
   }
+
   // getAllBlocks() {
   //     this.app.get("/blocks", (req, res) => {
 
