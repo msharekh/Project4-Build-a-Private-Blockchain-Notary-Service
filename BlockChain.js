@@ -203,6 +203,31 @@ class BlockChain {
     });
   }
 
+  getBlockByWalletAddress(address) {
+    let block = null;
+    return new Promise(function(resolve, reject) {
+      db.createReadStream()
+        .on('data', function(data) {
+          console.log(data.key, '=', data.value);
+          if (JSON.parse(data.value).body.address === address) {
+            block = data.value;
+          }
+        })
+        .on('error', function(err) {
+          console.log('Oh my!', err);
+
+          reject(err);
+        })
+        .on('close', function() {
+          console.log('Stream closed');
+
+          resolve(block);
+        })
+        .on('end', function() {
+          console.log('Stream ended');
+        });
+    });
+  }
   /*################################################
     ################ validate block  #################
     ################################################*/

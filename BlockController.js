@@ -41,7 +41,7 @@ class BlockController {
     this.postNewBlock();
     this.requestValidation();
     this.validate();
-    this.controllerGetBlockByHash();
+    this.controllerGetBlockByParam();
     this.mempool = [];
     this.timeoutRequests = [];
   }
@@ -50,32 +50,67 @@ class BlockController {
    * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
    */
 
-  controllerGetBlockByHash() {
+  controllerGetBlockByParam() {
     let self = this;
-    self.app.get('/stars/:hash', (req, res) => {
+    self.app.get('/stars/:param', (req, res) => {
       // Add your code here
-      var hash = req.params.hash;
-      console.log('hash', ':	', hash);
+      let param = req.params.param;
 
-      let bc = new BlockChainClass.BlockChain();
-      bc.getBlockByHash(hash)
-        .then(b => {
-          let block = JSON.parse(b);
-          let encodedStory = block.body.star.story;
-          console.log('encoded Story', '	', encodedStory);
-          let deocdedStory = hex2ascii(encodedStory);
+      let colonIndx = 0;
+      colonIndx = param.indexOf(':');
+      let parName = param.substr(0, colonIndx);
+      let parValue = param.substr(colonIndx + 1, param.length);
 
-          block.body.star.storyDecoded = deocdedStory;
+      let bc;
+      switch (parName) {
+        case 'hash':
+          console.log('hash', ':	', parValue);
+          let hash = parValue;
+          bc = new BlockChainClass.BlockChain();
+          bc.getBlockByHash(hash)
+            .then(b => {
+              let block = JSON.parse(b);
+              let encodedStory = block.body.star.story;
+              console.log('encoded Story', '	', encodedStory);
+              let deocdedStory = hex2ascii(encodedStory);
 
-          c(block);
-          res.send(block);
-        })
-        .catch(err => {
-          console.log('failed call by hash', err); // { error: 'url missing in async task 2' }
-          res.send(err);
-        });
+              block.body.star.storyDecoded = deocdedStory;
+
+              c(block);
+              res.send(block);
+            })
+            .catch(err => {
+              console.log('failed call by hash', err); // { error: 'url missing in async task 2' }
+              res.send(err);
+            });
+          break;
+        case 'address':
+          console.log('address', ':	', parValue);
+          let address = parValue;
+          bc = new BlockChainClass.BlockChain();
+          bc.getBlockByWalletAddress(address)
+            .then(b => {
+              let block = JSON.parse(b);
+              let encodedStory = block.body.star.story;
+              console.log('encoded Story', '	', encodedStory);
+              let deocdedStory = hex2ascii(encodedStory);
+
+              block.body.star.storyDecoded = deocdedStory;
+
+              c(block);
+              res.send(block);
+            })
+            .catch(err => {
+              console.log('failed call by address', err); // { error: 'url missing in async task 2' }
+              res.send(err);
+            });
+          break;
+        default:
+          break;
+      }
     });
   }
+
   getBlockByIndex() {
     this.app.get('/block/:blockheight', (req, res) => {
       // Add your code here
