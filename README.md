@@ -78,7 +78,7 @@ curl -X POST \
             }'
 ```
 
-Service checks if signature is valid. Inform the user of the result
+Service checks if signature is valid. it informs the user of the result
 ```
 {  
    "registerStar":true,
@@ -92,11 +92,14 @@ Service checks if signature is valid. Inform the user of the result
 }
 ```
 #### If signature is valid, user is able to submit a star.
-for example, when "star": {
+for example, when 
+```
+"star": {
                         "dec": "69° 27'\'' 1.2",
                         "ra": "9h 54m 26s",
                         "story": "Found star using https://www.google.com/sky/"
                     }
+ ```
  and use the following url:
 (http://localhost:8000/block)
 ```
