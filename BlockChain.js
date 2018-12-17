@@ -204,13 +204,14 @@ class BlockChain {
   }
 
   getBlockByWalletAddress(address) {
-    let block = null;
+    // TODO: S-16.	response contained a list of Stars of one wallet address for multiple Stars.
+    let blocks = [];
     return new Promise(function(resolve, reject) {
       db.createReadStream()
         .on('data', function(data) {
           console.log(data.key, '=', data.value);
           if (JSON.parse(data.value).body.address === address) {
-            block = data.value;
+            blocks.push(data.value);
           }
         })
         .on('error', function(err) {
@@ -221,7 +222,7 @@ class BlockChain {
         .on('close', function() {
           console.log('Stream closed');
 
-          resolve(block);
+          resolve(blocks);
         })
         .on('end', function() {
           console.log('Stream ended');

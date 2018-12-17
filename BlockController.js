@@ -17,16 +17,6 @@ function isEmpty(obj) {
   }
   return true;
 }
-/**
- 
-   ____  _            _       _____            _             _ _           
-  |  _ \| |          | |     / ____|          | |           | | |          
-  | |_) | | ___   ___| | __ | |     ___  _ __ | |_ _ __ ___ | | | ___ _ __ 
-  |  _ <| |/ _ \ / __| |/ / | |    / _ \| '_ \| __| '__/ _ \| | |/ _ \ '__|
-  | |_) | | (_) | (__|   <  | |___| (_) | | | | |_| | | (_) | | |  __/ |   
-  |____/|_|\___/ \___|_|\_\  \_____\___/|_| |_|\__|_|  \___/|_|_|\___|_|   
-
- */
 
 class BlockController {
   /**
@@ -52,6 +42,10 @@ class BlockController {
 
   controllerGetBlockByParam() {
     let self = this;
+
+    // TODO: S-12.	Use the URL:http://localhost:8000/stars/hash:[HASH]
+    // TODO: S-14.	Use the URL:http://localhost:8000/stars/address:[ADDRESS]
+
     self.app.get('/stars/:param', (req, res) => {
       // Add your code here
       let param = req.params.param;
@@ -74,6 +68,8 @@ class BlockController {
               console.log('encoded Story', '	', encodedStory);
               let deocdedStory = hex2ascii(encodedStory);
 
+              // TODO: S-13.	The response includes entire star block contents and story decoded to ASCII.
+
               block.body.star.storyDecoded = deocdedStory;
 
               c(block);
@@ -89,16 +85,23 @@ class BlockController {
           let address = parValue;
           bc = new BlockChainClass.BlockChain();
           bc.getBlockByWalletAddress(address)
-            .then(b => {
-              let block = JSON.parse(b);
-              let encodedStory = block.body.star.story;
-              console.log('encoded Story', '	', encodedStory);
-              let deocdedStory = hex2ascii(encodedStory);
+            .then(blocks => {
+              let block = null;
+              let WalletStarBlocks = [];
+              blocks.forEach(b => {
+                block = JSON.parse(b);
 
-              block.body.star.storyDecoded = deocdedStory;
+                let encodedStory = block.body.star.story;
+                console.log('encoded Story', '	', encodedStory);
+                let deocdedStory = hex2ascii(encodedStory);
+                // TODO: S-15.	The response includes entire star block contents and story decoded to ASCII.
 
-              c(block);
-              res.send(block);
+                block.body.star.storyDecoded = deocdedStory;
+                WalletStarBlocks.push(block);
+              });
+
+              c(WalletStarBlocks);
+              res.send(WalletStarBlocks);
             })
             .catch(err => {
               console.log('failed call by address', err); // { error: 'url missing in async task 2' }
@@ -112,6 +115,8 @@ class BlockController {
   }
 
   getBlockByIndex() {
+    // TODO: S-17.	Use the URL:http://localhost:8000/block/[HEIGHT]
+
     this.app.get('/block/:blockheight', (req, res) => {
       // Add your code here
       var blockheight = req.params.blockheight;
@@ -123,8 +128,18 @@ class BlockController {
 
       bc.getBlock(blockheight)
         .then(b => {
-          c(JSON.parse(b));
-          res.send(JSON.parse(b));
+          let block = JSON.parse(b);
+
+          let encodedStory = block.body.star.story;
+          console.log('encoded Story', '	', encodedStory);
+          let deocdedStory = hex2ascii(encodedStory);
+
+          // TODO: S-18.	The response includes entire star block contents along with the addition of star 	story decoded to ASCII.
+
+          block.body.star.storyDecoded = deocdedStory;
+
+          c(block);
+          res.send(block);
         })
         .catch(err => {
           console.log('failed ', err); // { error: 'url missing in async task 2' }
