@@ -140,13 +140,13 @@ After submitting a star, the same user has to restart all the process to be able
 
  #### Star Lookup 
  
- ###### Get Star block by hash with JSON response.
+ Get Star block by hash with JSON response.
  Use the URL (http://localhost:8000/stars/hash:[HASH])
  
-  ###### et Star block by wallet address (blockchain identity) with JSON response.
+ Get Star block by wallet address (blockchain identity) with JSON response.
  Use the URL (http://localhost:8000/stars/address:[ADDRESS])
  
-  ###### Get star block by star block height with JSON response.
+ Get star block by star block height with JSON response.
  Use the URL (http://localhost:8000/block/[HEIGHT])
  
  
