@@ -48,8 +48,10 @@ curl -X POST \
                 -H 'Content-Type: application/json' \
                 -H 'cache-control: no-cache' \
                 -d '{ "address":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc" }'
-the API responds with a message that the user should sign with its private keys:
+
 ```
+the API responds with a message that the user should sign with its private keys:
+
 ```
 {  
    "walletAddress":"1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
