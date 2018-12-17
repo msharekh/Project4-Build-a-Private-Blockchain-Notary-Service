@@ -7,7 +7,8 @@ This application is build usijng RESTful API, ExpressJS
 
 ## Download project
 ```
-git clone https://github.com/msharekh/Project4-Build-a-Private-Blockchain-Notary-Service.js.git
+git clone https://github.com/msharekh/Project4-Build-a-Private-Blockchain-Notary-Service.git
+
 ```
 
 
