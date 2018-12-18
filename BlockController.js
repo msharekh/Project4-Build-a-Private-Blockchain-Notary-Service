@@ -11,11 +11,54 @@ function c(txt) {
   console.log(txt);
 }
 
-function isEmpty(obj) {
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) return false;
+// function isEmpty(obj) {
+//   for (var key in obj) {
+//     if (obj.hasOwnProperty(key)) return false;
+
+//   }
+//   return true;
+// }
+
+function empty(e) {
+  switch (e) {
+    case "":
+    case null:
+    case typeof this == "undefined":
+    return true;
+    default:
+    return false;
   }
-  return true;
+}
+
+
+
+function isEmpty(obj) {  
+  
+  for (var x in obj){
+    if (obj.hasOwnProperty(x)) {           
+      if(typeof(obj[x])=='string'){
+        if (empty(obj[x])) {
+          return true;
+        }
+      }
+      else if(typeof(obj[x])=='number'){
+        if (empty(obj[x])) {
+          return true;
+        }
+      }
+      else if(typeof(obj[x])=='object'){
+        // TODO: SV-2.  required properties of star object are dec, ra and story
+        if (isEmpty(obj[x])) {
+          return true;
+        }
+             
+            }
+       }
+       else{
+           return true
+       }
+  }
+  return false
 }
 
 class BlockController {
@@ -177,6 +220,7 @@ class BlockController {
 
       // console.log(`\n\n*** postNewBlock \t {BlockData} ***`);
       console.log(req.body);
+      
 
       if (isEmpty(req.body) && req.body.length == 1) {
         // if Object is empty it return true
@@ -186,7 +230,7 @@ class BlockController {
         // Object is NOT empty
         console.log('story', '	', req.body.star.story);
         let address = req.body.address;
-
+        
         // TODO: S-10.	Verify that the "address" that send the Star was validated in the previous steps or error.
         let isAddressInMempool = false;
         if (self.mempool.length == 0) {
@@ -215,13 +259,29 @@ class BlockController {
                     star: star
                   };
 
-                  let block = new BlockClass.Block(body);
+                  if (isEmpty(body)) {
+                    res.send('please complete all requried entries!');
+
+                  } else {
+                    let block = new BlockClass.Block(body);
                   bc.addBlock(block)
                     .then(result => {
                       // console.log('The response after adding should contain that block.js ');
 
                       // TODO: S-11.	The response will look like
                       let block = JSON.parse(result);
+
+                      let idx=0
+                      self.mempool.forEach(mem => {
+                        if (mem.walletAddress == block.body.address) {
+                          
+                                  // TODO: SV-1.	delete all the data associated with the given address from your mempool
+
+                          self.mempool.splice(idx,1)
+                          idx++
+                        }
+                      });
+
                       let encodedStory = block.body.star.story;
                       console.log('encoded Story', '	', encodedStory);
                       let deocdedStory = hex2ascii(encodedStory);
@@ -233,9 +293,13 @@ class BlockController {
                         block.body.star.storyDecoded
                       );
 
+
                       res.send(block);
                     })
                     .catch(e => console.error(`.addBlock catch(${e})`));
+                  }
+
+                  
                 } else {
                   res.send('Wrong entry, please enter again');
                 }

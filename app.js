@@ -1,3 +1,21 @@
+let block= {
+  "hash": "c867b695e3284e8c88c6bc7cbe3805a1c17c1f6f296eb11ac19d4c3d1af70d64",
+  "height": 1,
+  "body": {
+      "address": "1Kc8NccSW4qieURf2AjikTzs99vq1oBerc",
+      "star": {
+          "dec": "",
+          "ra": "9h 54m 26s",
+          "story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f",
+          "storyDecoded": "Found star using https://www.google.com/sky/"
+      }
+  },
+  "time": "1544993113",
+  "previousBlockHash": "d58a0de0b707ae8d472859fa08fa0f87cf02394865eedad53b68fe5bec9254d4"
+}
+
+
+
 /*
     _____  _____  _______      __  _______ ______     ____  _      ____   _____ _  _______ _    _          _____ _   _  
    |  __ \|  __ \|_   _\ \    / /\|__   __|  ____|   |  _ \| |    / __ \ / ____| |/ / ____| |  | |   /\   |_   _| \ | | 
