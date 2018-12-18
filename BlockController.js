@@ -170,13 +170,14 @@ class BlockController {
         .then(b => {
           let block = JSON.parse(b);
 
-          let encodedStory = block.body.star.story;
-          console.log('encoded Story', '	', encodedStory);
-          let deocdedStory = hex2ascii(encodedStory);
+          if (block.height > 0) {
+            let encodedStory = block.body.star.story;
+            console.log('encoded Story', '	', encodedStory);
+            let deocdedStory = hex2ascii(encodedStory);
+            // TODO: S-18.	The response includes entire star block contents along with the addition of star 	story decoded to ASCII.
 
-          // TODO: S-18.	The response includes entire star block contents along with the addition of star 	story decoded to ASCII.
-
-          block.body.star.storyDecoded = deocdedStory;
+            block.body.star.storyDecoded = deocdedStory;
+          }
 
           c(block);
           res.send(block);
